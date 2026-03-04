@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// 인증 관련 모델
+// ============================================
+
+// 사용자 모델
+model User {
+  id                String    @id @default(uuid()) @db.Char(36)
+  name              String    @db.VarChar(50)
+  email             String    @unique @db.VarChar(100)
+  passwordHash      String?   @map("password_hash") @db.VarChar(255) // SSO 사용자는 NULL
+  phone             String?   @db.VarChar(20)
+  companyName       String?   @map("company_name") @db.VarChar(100)
+  position          String?   @db.VarChar(50)
+  avatarUrl         String?   @map("avatar_url") @db.VarChar(500)
+  emailVerified     DateTime? @map("email_verified")
+  twoFactorEnabled  Boolean   @default(false) @map("two_factor_enabled")
+  lastLoginAt       DateTime? @map("last_login_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  deletedAt         DateTime? @map("deleted_at")
+
+  // NextAuth 관계
+  accounts          Account[]
+  sessions          Session[]
+
+  // JWT 토큰 관계
+  tokens           Token[]
+
+  @@index([email])
+  @@index([lastLoginAt])
+  @@index([deletedAt])
+  @@map("users")
+}
+
+// NextAuth: SSO 계정 연결
+model Account {
+  id                String  @id @default(uuid()) @db.Char(36)
+  userId            String  @map("user_id") @db.Char(36)
+  type              String  @db.VarChar(50) // oauth, credentials 등
+  provider          String  @db.VarChar(50) // google, kakao, naver, credentials
+  providerAccountId String  @map("provider_account_id") @db.VarChar(255)
+  refreshToken      String? @map("refresh_token") @db.Text
+  accessToken       String? @map("access_token") @db.Text
+  expiresAt         Int?    @map("expires_at")
+  tokenType         String? @map("token_type") @db.VarChar(50)
+  scope             String? @db.Text
+  idToken           String? @map("id_token") @db.Text
+  sessionState      String? @map("session_state") @db.VarChar(255)
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+// NextAuth: 세션 관리
+model Session {
+  id           String   @id @default(uuid()) @db.Char(36)
+  sessionToken String   @unique @map("session_token") @db.VarChar(255)
+  userId       String   @map("user_id") @db.Char(36)
+  expires      DateTime
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
+  @@map("sessions")
+}
+
+// JWT 토큰 관리 (Access Token, Refresh Token)
+model Token {
+  id            String   @id @default(uuid()) @db.Char(36)
+  userId       String   @map("user_id") @db.Char(36)
+  tokenType    String   @map("token_type") @db.VarChar(20) // access, refresh
+  token        String   @db.Text
+  expiresAt    DateTime @map("expires_at")
+  isRevoked    Boolean  @default(false) @map("is_revoked")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenType])
+  @@index([expiresAt])
+  @@index([isRevoked])
+  @@map("tokens")
+}

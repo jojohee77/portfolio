@@ -1,0 +1,675 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #0c5ce2;
+  --primary-foreground: #ffffff;
+  --secondary: #e4f2ff;
+  --secondary-foreground: #0c5ce2;
+  --muted: #f8fafc;
+  --muted-foreground: #64748b;
+  --accent: #e4f2ff;
+  --accent-foreground: #0c5ce2;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #0c5ce2;
+  /* point colors */
+  --point-purple: #8b5cf6;
+  --point-purple-foreground: #ffffff;
+  --point-blue: #06b6d4;
+  --point-blue-foreground: #0f172a;
+  --point-green: #84cc16;
+  --point-green-foreground: #0f172a;
+  --point-orange: #f97316;
+  --point-orange-foreground: #ffffff;
+  /* soft background colors */
+  --bg-light-blue: #e4f2ff;
+  --bg-light-blue-foreground: #0f172a;
+  --bg-light-blue-border: #cfe6ff;
+  --bg-light-blue-hover: #d7ecff;
+  --bg-light-purple: #efe5ff;
+  --bg-light-purple-foreground: #0f172a;
+  --bg-light-purple-border: #e1d2ff;
+  --bg-light-purple-hover: #e6dbff;
+  --chart-1: #0c5ce2;
+  --chart-2: #3b82f6;
+  --chart-3: #8b5cf6;
+  --chart-4: #06b6d4;
+  --chart-5: #10b981;
+  /* extended pastel chart palette */
+  --chart-6: #a7c7ff;   /* pastel blue */
+  --chart-7: #c7e9ff;   /* pastel sky */
+  --chart-8: #e3d7ff;   /* pastel lavender */
+  --chart-9: #ffc9de;   /* pastel pink */
+  --radius: 0.5rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a1a1a;
+  --sidebar-primary: #0c5ce2;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e4f2ff;
+  --sidebar-accent-foreground: #0c5ce2;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #0c5ce2;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --popover: #1e293b;
+  --popover-foreground: #f8fafc;
+  --primary: #0c5ce2;
+  --primary-foreground: #ffffff;
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #f8fafc;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #334155;
+  --input: #334155;
+  --ring: #0c5ce2;
+  /* point colors (dark) */
+  --point-purple: #8b5cf6;
+  --point-purple-foreground: #ffffff;
+  --point-blue: #06b6d4;
+  --point-blue-foreground: #0f172a;
+  --point-green: #84cc16;
+  --point-green-foreground: #0f172a;
+  --point-orange: #f97316;
+  --point-orange-foreground: #ffffff;
+  /* soft background colors (dark) */
+  --bg-light-blue: #e4f2ff;
+  --bg-light-blue-foreground: #0f172a;
+  --bg-light-blue-border: #cfe6ff;
+  --bg-light-blue-hover: #d7ecff;
+  --bg-light-purple: #efe5ff;
+  --bg-light-purple-foreground: #0f172a;
+  --bg-light-purple-border: #e1d2ff;
+  --bg-light-purple-hover: #e6dbff;
+  --chart-1: #0c5ce2;
+  --chart-2: #3b82f6;
+  --chart-3: #8b5cf6;
+  --chart-4: #06b6d4;
+  --chart-5: #10b981;
+  /* extended pastel chart palette (dark) */
+  --chart-6: #a7c7ff;
+  --chart-7: #c7e9ff;
+  --chart-8: #e3d7ff;
+  --chart-9: #ffc9de;
+  --sidebar: #1e293b;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #0c5ce2;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #334155;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: #334155;
+  --sidebar-ring: #0c5ce2;
+}
+
+@theme inline {
+  --font-pretendard:
+    "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Select 드롭다운이 열릴 때 body에 overflow: hidden이 적용되지 않도록 방지 */
+body {
+  @apply bg-background text-foreground;
+}
+
+/* Select 드롭다운 컨테이너 스타일 강제 적용 */
+[data-radix-select-content] {
+  z-index: 99999 !important;
+}
+
+@layer utilities {
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes gradient-move {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .gradient-animate-primary {
+    background-image: linear-gradient(90deg, var(--primary), #3b82f6, var(--primary));
+    background-size: 200% 200%;
+    animation: gradient-move 6s ease infinite;
+  }
+
+  .gradient-animate-primary:hover {
+    animation-duration: 3s;
+  }
+  
+  .animate-float {
+    animation: float 2.5s ease-in-out infinite;
+  }
+
+  /* 얇은 스크롤바 스타일 */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(203 213 225 / 0.5) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgb(203 213 225 / 0.5);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(203 213 225 / 0.8);
+  }
+
+  /* 스크롤바 숨기기 */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 모바일처럼 스크롤할 때만 나타나는 스크롤바 */
+  .scrollbar-overlay {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .scrollbar-overlay::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-overlay::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-overlay::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 3px;
+  }
+
+  .scrollbar-overlay:active::-webkit-scrollbar-thumb,
+  .scrollbar-overlay:focus::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* React DatePicker 커스텀 스타일 */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container {
+  width: 100%;
+}
+
+.react-datepicker__input-container input {
+  width: 100%;
+  height: 36px;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: white;
+  font-size: 14px;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.react-datepicker__input-container input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.react-datepicker__input-container input::placeholder {
+  color: #9ca3af;
+}
+
+.react-datepicker-popper {
+  z-index: 9999;
+}
+
+.react-datepicker-popper[data-placement^="bottom"] {
+  padding-top: 8px;
+}
+
+.react-datepicker-popper[data-placement^="top"] {
+  padding-bottom: 8px;
+}
+
+.react-datepicker {
+  border: 1px solid #f1f5f9 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  font-family: inherit;
+}
+
+/* DatePicker 헤더 레이아웃 개선 */
+.react-datepicker__header {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  border-radius: 12px 12px 0 0 !important;
+  padding: 12px 16px !important;
+  position: relative !important;
+  min-height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.react-datepicker__current-month {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #1f2937 !important;
+  text-align: center !important;
+  margin: 0 !important;
+}
+
+/* 네비게이션 버튼 - 헤더와 같은 높이에 위치하도록 조정 */
+.react-datepicker__navigation {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 6px !important;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  padding: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  z-index: 1 !important;
+}
+
+.react-datepicker__navigation:hover {
+  background-color: #f3f4f6 !important;
+}
+
+.react-datepicker__navigation--previous {
+  left: 16px !important;
+}
+
+.react-datepicker__navigation--next {
+  right: 16px !important;
+}
+
+/* 헤더와 네비게이션 버튼의 완벽한 정렬 */
+.react-datepicker__header {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 타이틀을 헤더의 정확한 중앙에 배치 */
+.react-datepicker__current-month {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.react-datepicker__navigation-icon::before {
+  content: '' !important;
+  display: block !important;
+  width: 6px !important;
+  height: 6px !important;
+  border-color: #6b7280 !important;
+  border-width: 2px 2px 0 0 !important;
+  border-style: solid !important;
+  transform: rotate(-45deg) !important;
+  transition: all 0.2s ease !important;
+}
+
+.react-datepicker__navigation--next .react-datepicker__navigation-icon::before {
+  transform: rotate(45deg) !important;
+}
+
+/* 화살표 아이콘 호버 효과 */
+.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+  border-color: #3b82f6 !important;
+}
+
+.react-datepicker__day-names {
+  margin-bottom: 8px;
+}
+
+.react-datepicker__day-name {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+  width: 32px;
+  line-height: 32px;
+  text-align: center;
+}
+
+.react-datepicker__day {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  margin: 2px;
+  border-radius: 6px;
+  color: #374151;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.react-datepicker__day:hover {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
+
+.react-datepicker__day--selected {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.react-datepicker__day--selected:hover {
+  background-color: #2563eb;
+}
+
+.react-datepicker__day--keyboard-selected {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.react-datepicker__day--disabled {
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.react-datepicker__day--disabled:hover {
+  background-color: transparent;
+  color: #d1d5db;
+}
+
+.react-datepicker__navigation {
+  position: absolute;
+  top: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  transform: translateY(-50%) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  margin: 0;
+}
+
+.react-datepicker__navigation-icon::before {
+  content: '';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background-size: 20px 20px;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none !important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) !important;
+  transition: all 0.2s ease;
+}
+
+.react-datepicker__navigation:hover {
+  background-color: #f3f4f6;
+}
+
+.react-datepicker__navigation--previous {
+  left: 16px;
+}
+
+.react-datepicker__navigation--next {
+  right: 16px;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: #6b7280;
+  border-width: 2px 2px 0 0;
+  width: 6px;
+  height: 6px;
+}
+
+.react-datepicker__month {
+  margin: 8px 12px;
+}
+
+.react-datepicker__week {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* 한국어 캘린더 추가 스타일 - 중복 제거됨 */
+
+.react-datepicker__month-container {
+  width: 100%;
+}
+
+.react-datepicker__month {
+  margin: 8px 12px;
+  width: calc(100% - 24px);
+}
+
+.react-datepicker__day--outside-month {
+  color: transparent !important;
+  visibility: hidden !important;
+}
+
+.react-datepicker__day--outside-month:hover {
+  background-color: transparent !important;
+  color: transparent !important;
+}
+
+/* 한국어 요일 스타일 개선 */
+.react-datepicker__day-names {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+.react-datepicker__day-name {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  width: 32px;
+  line-height: 32px;
+  text-align: center;
+  text-transform: none;
+}
+
+/* 토요일 스타일 (파란색) */
+.react-datepicker__day-name:nth-child(7) {
+  color: #3b82f6 !important;
+}
+
+/* 일요일 스타일 (빨간색) */
+.react-datepicker__day-name:nth-child(1) {
+  color: #ef4444 !important;
+}
+
+/* 월/년도 네비게이션 스타일 - 중복 제거됨 */
+
+
+/* 왼쪽 화살표 (이전 달) - 크기 증가 및 정렬 */
+.react-datepicker__navigation--previous .react-datepicker__navigation-icon::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M15 19l-7-7 7-7'/%3E%3C/svg%3E");
+  transform: translate(-50%, -50%) !important;
+  width: 20px !important;
+  height: 20px !important;
+  background-size: 20px 20px !important;
+}
+
+/* 오른쪽 화살표 (다음 달) - 크기 증가 및 정렬 */
+.react-datepicker__navigation--next .react-datepicker__navigation-icon::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M9 5l7 7-7 7'/%3E%3C/svg%3E");
+  transform: translate(-50%, -50%) !important;
+  width: 20px !important;
+  height: 20px !important;
+  background-size: 20px 20px !important;
+}
+
+/* 호버 효과 개선 */
+.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+  transform: translate(-50%, -50%) scale(1.1) !important;
+}
+
+/* 왼쪽 화살표 호버 시 색상 변경 */
+.react-datepicker__navigation--previous:hover .react-datepicker__navigation-icon::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M15 19l-7-7 7-7'/%3E%3C/svg%3E");
+}
+
+/* 오른쪽 화살표 호버 시 색상 변경 */
+.react-datepicker__navigation--next:hover .react-datepicker__navigation-icon::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233b82f6' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M9 5l7 7-7 7'/%3E%3C/svg%3E");
+}
+
+/* 로딩 애니메이션 */
+@keyframes loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(250%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* CustomDatePicker 모바일 고정 사이즈 */
+@media (max-width: 640px) {
+  /* 캘린더 컨테이너 고정 사이즈 */
+  .custom-datepicker-calendar {
+    width: 320px !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+  }
+  
+  /* 날짜 셀 정사각형 비율 강제 */
+  .custom-datepicker-calendar .grid-cols-7 > div {
+    aspect-ratio: 1 / 1 !important;
+    width: 100% !important;
+    height: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  /* 버튼 정사각형 비율 강제 */
+  .custom-datepicker-calendar .grid-cols-7 > div button {
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+  }
+}
+
+/* 일별 키워드 테이블 헤더 커스텀 스타일 */
+.daily-keywords-table-header {
+  background-color: #f3f4f6 !important;
+}
+
+.daily-keywords-header-cell {
+  background-color: #f3f4f6 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+
+.daily-keywords-data-cell {
+  border-bottom: 1px solid #e5e7eb !important;
+}

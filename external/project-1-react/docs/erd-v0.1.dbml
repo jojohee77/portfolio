@@ -1,0 +1,537 @@
+// AgOffice ERD v0.1
+// 작성일: 2025-11-11
+// 도구: dbdiagram.io
+// 사용법: https://dbdiagram.io 에 접속하여 이 코드를 붙여넣기
+
+Project AgOffice {
+  database_type: 'PostgreSQL'
+  Note: 'AgOffice - 마케팅 관리 플랫폼 데이터베이스 스키마'
+}
+
+// ============================================
+// 1. 조직/사용자 관리
+// ============================================
+
+Table users {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  name varchar(50) [not null]
+  email varchar(100) [not null, unique]
+  password_hash varchar(255) [not null]
+  phone varchar(20)
+  company_name varchar(100)
+  position varchar(50)
+  avatar_url varchar(500)
+  two_factor_enabled boolean [not null, default: false]
+  last_login_at timestamp
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  deleted_at timestamp
+
+  indexes {
+    email [unique, name: 'idx_users_email']
+    last_login_at [name: 'idx_users_last_login']
+    deleted_at [name: 'idx_users_deleted']
+  }
+
+  Note: '시스템 사용자 (계정)'
+}
+
+Table workspaces {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  name varchar(100) [not null]
+  logo_url varchar(500)
+  description text
+  owner_id uuid [not null, ref: > users.id]
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    owner_id [name: 'idx_workspaces_owner']
+  }
+
+  Note: '워크스페이스 (다중 테넌트)'
+}
+
+Table teams {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  workspace_id uuid [not null, ref: > workspaces.id]
+  name varchar(50) [not null]
+  department varchar(50)
+  lead_id uuid [ref: > users.id]
+  description text
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    workspace_id [name: 'idx_teams_workspace']
+    lead_id [name: 'idx_teams_lead']
+    (workspace_id, name) [unique, name: 'idx_teams_workspace_name']
+  }
+
+  Note: '팀/부서'
+}
+
+Table workspace_users {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  workspace_id uuid [not null, ref: > workspaces.id]
+  user_id uuid [not null, ref: > users.id]
+  team_id uuid [ref: > teams.id]
+  role varchar(20) [not null, default: 'Member', note: 'Owner, Admin, Manager, Member']
+  status varchar(20) [not null, default: '초대중', note: '활성, 비활성, 초대중']
+  joined_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    workspace_id [name: 'idx_workspace_users_workspace']
+    user_id [name: 'idx_workspace_users_user']
+    team_id [name: 'idx_workspace_users_team']
+    role [name: 'idx_workspace_users_role']
+    status [name: 'idx_workspace_users_status']
+    (workspace_id, user_id) [unique, name: 'idx_workspace_users_unique']
+  }
+
+  Note: '워크스페이스 멤버십 (N:N 중간 테이블)'
+}
+
+// ============================================
+// 2. 고객 및 계약 관리
+// ============================================
+
+Table customers {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  workspace_id uuid [not null, ref: > workspaces.id]
+  company_name varchar(100) [not null]
+  contact_person varchar(50) [not null]
+  phone varchar(20) [not null]
+  address text
+  region_sido varchar(20)
+  region_sigungu varchar(50)
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    workspace_id [name: 'idx_customers_workspace']
+    company_name [name: 'idx_customers_company_name']
+    (region_sido, region_sigungu) [name: 'idx_customers_region']
+  }
+
+  Note: '고객사 정보'
+}
+
+Table contracts {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  workspace_id uuid [not null, ref: > workspaces.id]
+  contract_number varchar(20) [not null, unique, note: 'CT-YYYY-###']
+  contract_type varchar(20) [not null, note: '월계약, 프로젝트, 연계약']
+  status varchar(20) [not null, default: '신규', note: '신규, 연장, 확장']
+  customer_id uuid [not null, ref: > customers.id]
+  team_id uuid [not null, ref: > teams.id]
+  manager_id uuid [not null, ref: > users.id]
+  sales_rep_id uuid [not null, ref: > users.id]
+  services text[] [not null, note: 'Array: SEO, 프리미엄, 하나탑']
+  amount decimal(15,2) [not null]
+  posting_count int
+  ad_cost_total decimal(15,2)
+  ad_cost_monthly decimal(15,2)
+  start_date date [not null]
+  end_date date [not null]
+  is_expired boolean [not null, default: false]
+  registration_date date [not null, default: `CURRENT_DATE`]
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    workspace_id [name: 'idx_contracts_workspace']
+    contract_number [unique, name: 'idx_contracts_number']
+    customer_id [name: 'idx_contracts_customer']
+    team_id [name: 'idx_contracts_team']
+    manager_id [name: 'idx_contracts_manager']
+    sales_rep_id [name: 'idx_contracts_sales_rep']
+    (status, registration_date) [name: 'idx_contracts_status_regdate']
+    (start_date, end_date) [name: 'idx_contracts_dates']
+    is_expired [name: 'idx_contracts_expired']
+  }
+
+  Note: '고객 계약'
+}
+
+// ============================================
+// 3. 업무 관리
+// ============================================
+
+Table work_tasks {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  workspace_id uuid [not null, ref: > workspaces.id]
+  contract_id uuid [not null, ref: > contracts.id]
+  service_type varchar(50) [not null]
+  description text
+  team_id uuid [not null, ref: > teams.id]
+  assignee_id uuid [not null, ref: > users.id]
+  target_keywords text
+  keyword_rank_limit int
+  status varchar(20) [not null, default: '대기', note: '진행중, 완료, 대기, 보류']
+  start_date date [not null]
+  end_date date [not null]
+  notes text
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    workspace_id [name: 'idx_worktasks_workspace']
+    contract_id [name: 'idx_worktasks_contract']
+    team_id [name: 'idx_worktasks_team']
+    assignee_id [name: 'idx_worktasks_assignee']
+    (status, created_at) [name: 'idx_worktasks_status_created']
+    (start_date, end_date) [name: 'idx_worktasks_dates']
+  }
+
+  Note: '업무/작업 관리'
+}
+
+Table keyword_assignments {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  work_task_id uuid [not null, ref: > work_tasks.id]
+  keyword_name varchar(100) [not null]
+  assigned_team_id uuid [not null, ref: > teams.id]
+  assigned_user_id uuid [not null, ref: > users.id]
+  rank_limit int
+  is_target_keyword boolean [not null, default: false]
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    work_task_id [name: 'idx_keyword_assignments_task']
+    keyword_name [name: 'idx_keyword_assignments_keyword']
+    assigned_user_id [name: 'idx_keyword_assignments_user']
+    assigned_team_id [name: 'idx_keyword_assignments_team']
+  }
+
+  Note: '업무별 키워드 할당'
+}
+
+// ============================================
+// 4. 키워드 및 포스팅 추적
+// ============================================
+
+Table keywords {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  workspace_id uuid [not null, ref: > workspaces.id]
+  name varchar(100) [not null]
+  competition_level varchar(20) [note: '아주좋음, 좋음, 보통, 나쁨, 아주나쁨']
+  monthly_search_volume int
+  monthly_post_volume int
+  blog_saturation decimal(5,2)
+  is_target boolean [not null, default: false]
+  is_tracking_active boolean [not null, default: true]
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    workspace_id [name: 'idx_keywords_workspace']
+    (workspace_id, name) [unique, name: 'idx_keywords_workspace_name']
+    competition_level [name: 'idx_keywords_competition']
+    is_target [name: 'idx_keywords_target']
+    is_tracking_active [name: 'idx_keywords_tracking']
+  }
+
+  Note: '키워드 마스터'
+}
+
+Table postings {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  workspace_id uuid [not null, ref: > workspaces.id]
+  blog_url varchar(500) [not null, unique]
+  customer_id uuid [not null, ref: > customers.id]
+  title varchar(200) [not null]
+  keyword varchar(100) [not null]
+  manager_id uuid [not null, ref: > users.id]
+  team_id uuid [not null, ref: > teams.id]
+  category varchar(20) [not null, default: '신규', note: '신규, 재작업']
+  contract_threshold int
+  current_rank int
+  rank_change int
+  is_favorite boolean [not null, default: false]
+  original_posting_id uuid [ref: > postings.id, note: 'Self-reference for 재작업']
+  is_tracking_active boolean [not null, default: true]
+  registered_date date [not null, default: `CURRENT_DATE`]
+  last_checked timestamp
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    workspace_id [name: 'idx_postings_workspace']
+    blog_url [unique, name: 'idx_postings_url']
+    customer_id [name: 'idx_postings_customer']
+    keyword [name: 'idx_postings_keyword']
+    manager_id [name: 'idx_postings_manager']
+    team_id [name: 'idx_postings_team']
+    (category, current_rank) [name: 'idx_postings_category_rank']
+    is_favorite [name: 'idx_postings_favorite']
+    registered_date [name: 'idx_postings_registered']
+    last_checked [name: 'idx_postings_last_checked']
+    original_posting_id [name: 'idx_postings_original']
+  }
+
+  Note: '블로그 포스팅 추적'
+}
+
+Table ranking_history {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  posting_id uuid [not null, ref: > postings.id]
+  checked_date date [not null]
+  rank int
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    posting_id [name: 'idx_ranking_history_posting']
+    checked_date [name: 'idx_ranking_history_date']
+    (posting_id, checked_date) [unique, name: 'idx_ranking_history_unique']
+  }
+
+  Note: '포스팅 순위 이력 (일별)'
+}
+
+// ============================================
+// 5. 집계 테이블 (매출/성과)
+// ============================================
+
+Table revenue {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  workspace_id uuid [not null, ref: > workspaces.id]
+  year int [not null]
+  half varchar(10) [note: '상반기, 하반기, NULL']
+  month int [not null]
+  service_name varchar(50) [not null, note: 'SEO, 프리미엄, 하나탑']
+  team_id uuid [ref: > teams.id]
+  total_revenue decimal(15,2) [not null, default: 0]
+  contracts_count int [not null, default: 0]
+  posting_cost decimal(15,2)
+  posting_count int
+  avg_contract_value decimal(15,2)
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    workspace_id [name: 'idx_revenue_workspace']
+    (year, month) [name: 'idx_revenue_year_month']
+    service_name [name: 'idx_revenue_service']
+    team_id [name: 'idx_revenue_team']
+    (workspace_id, year, month, service_name, team_id) [unique, name: 'idx_revenue_unique']
+  }
+
+  Note: '매출 집계 (서비스별/월별)'
+}
+
+Table performance {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  workspace_id uuid [not null, ref: > workspaces.id]
+  year int [not null]
+  half varchar(10) [note: '상반기, 하반기, NULL']
+  month int [not null]
+  team_id uuid [not null, ref: > teams.id]
+  member_id uuid [not null, ref: > users.id]
+  monthly_revenue decimal(15,2) [not null, default: 0]
+  contract_count int [not null, default: 0]
+  company_count int [not null, default: 0]
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    workspace_id [name: 'idx_performance_workspace']
+    (year, month) [name: 'idx_performance_year_month']
+    team_id [name: 'idx_performance_team']
+    member_id [name: 'idx_performance_member']
+    (workspace_id, year, month, team_id, member_id) [unique, name: 'idx_performance_unique']
+  }
+
+  Note: '성과 집계 (팀/개인별)'
+}
+
+// ============================================
+// 6. 멤버십 및 결제
+// ============================================
+
+Table memberships {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  user_id uuid [not null, unique, ref: - users.id]
+  level varchar(20) [not null, default: 'BASIC', note: 'BASIC, STANDARD, PREMIUM']
+  status varchar(20) [not null, default: '활성', note: '활성, 비활성, 만료']
+  start_date date [not null]
+  end_date date [not null]
+  renewal_date date
+  billing_cycle varchar(20) [not null, note: 'monthly, annual']
+  payment_method_id uuid [ref: > payment_methods.id]
+  price_monthly decimal(10,2) [not null]
+  price_annual decimal(10,2) [not null]
+  is_auto_renew boolean [not null, default: true]
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    user_id [unique, name: 'idx_memberships_user']
+    level [name: 'idx_memberships_level']
+    status [name: 'idx_memberships_status']
+    end_date [name: 'idx_memberships_end_date']
+  }
+
+  Note: '사용자 멤버십 구독'
+}
+
+Table payment_methods {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  user_id uuid [not null, ref: > users.id]
+  type varchar(20) [not null, default: 'card', note: 'card, bank_transfer']
+  card_last4 varchar(4)
+  card_brand varchar(20)
+  expiry_month int
+  expiry_year int
+  billing_name varchar(100)
+  pg_token varchar(500) [note: '암호화 권장']
+  is_default boolean [not null, default: false]
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    user_id [name: 'idx_payment_methods_user']
+    is_default [name: 'idx_payment_methods_default']
+  }
+
+  Note: '결제 수단'
+}
+
+Table payments {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  user_id uuid [not null, ref: > users.id]
+  membership_id uuid [ref: > memberships.id]
+  amount decimal(10,2) [not null]
+  currency varchar(3) [not null, default: 'KRW']
+  method varchar(50) [not null]
+  status varchar(20) [not null, default: '진행중', note: '완료, 진행중, 실패, 환불']
+  product_name varchar(100) [not null]
+  payment_date timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  receipt_url varchar(500)
+  pg_transaction_id varchar(100)
+  failure_reason text
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    user_id [name: 'idx_payments_user']
+    membership_id [name: 'idx_payments_membership']
+    status [name: 'idx_payments_status']
+    payment_date [name: 'idx_payments_date']
+    pg_transaction_id [name: 'idx_payments_pg_txn']
+  }
+
+  Note: '결제 내역'
+}
+
+// ============================================
+// 7. 지원 기능
+// ============================================
+
+Table notices {
+  id int [pk, increment]
+  type varchar(20) [not null, default: '공지', note: '공지, 이벤트, 업데이트']
+  title varchar(200) [not null]
+  content text [not null]
+  author_id uuid [not null, ref: > users.id]
+  is_pinned boolean [not null, default: false]
+  view_count int [not null, default: 0]
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    type [name: 'idx_notices_type']
+    (is_pinned, created_at) [name: 'idx_notices_pinned_created']
+    author_id [name: 'idx_notices_author']
+  }
+
+  Note: '공지사항'
+}
+
+Table inquiries {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  user_id uuid [not null, ref: > users.id]
+  subject varchar(200) [not null]
+  category varchar(20) [not null, default: '기타', note: '버그, 기능요청, 기타']
+  description text [not null]
+  attachment_url varchar(500)
+  status varchar(20) [not null, default: '접수', note: '접수, 답변중, 완료']
+  response text
+  responded_at timestamp
+  responder_id uuid [ref: > users.id]
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    user_id [name: 'idx_inquiries_user']
+    category [name: 'idx_inquiries_category']
+    status [name: 'idx_inquiries_status']
+    created_at [name: 'idx_inquiries_created']
+    responder_id [name: 'idx_inquiries_responder']
+  }
+
+  Note: '고객 문의'
+}
+
+Table notifications {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  user_id uuid [not null, ref: > users.id]
+  type varchar(50) [not null, note: '계약만료, 업무완료, 순위변동 등']
+  message text [not null]
+  link_url varchar(500)
+  is_read boolean [not null, default: false]
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    (user_id, is_read) [name: 'idx_notifications_user_read']
+    created_at [name: 'idx_notifications_created']
+    type [name: 'idx_notifications_type']
+  }
+
+  Note: '사용자 알림'
+}
+
+Table chat_messages {
+  id uuid [pk, default: `uuid_generate_v4()`]
+  user_id uuid [not null, ref: > users.id]
+  sender_type varchar(20) [not null, note: 'user, bot, admin']
+  message text [not null]
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    (user_id, created_at) [name: 'idx_chat_messages_user_created']
+    sender_type [name: 'idx_chat_messages_sender_type']
+  }
+
+  Note: '챗봇 메시지 이력'
+}
+
+// ============================================
+// Relationship 주석
+// ============================================
+
+// 조직 관계
+// - Workspace 1:N Team, Customer, Contract, WorkTask, Posting, Keyword, Revenue, Performance
+// - Team 1:N WorkspaceUser, Contract, WorkTask, KeywordAssignment, Posting
+// - User 1:N WorkspaceUser, Contract (manager/sales), WorkTask (assignee), Posting (manager)
+
+// 업무 흐름
+// - Contract 1:N WorkTask
+// - WorkTask 1:N KeywordAssignment
+// - Customer 1:N Contract, Posting
+
+// 포스팅 추적
+// - Posting 1:N RankingHistory
+// - Posting 1:N Posting (original_posting_id, Self-reference)
+
+// 멤버십
+// - User 1:1 Membership
+// - User 1:N PaymentMethod
+// - User 1:N Payment
+// - Membership 1:N Payment
+
+// 지원 기능
+// - User 1:N Notice (author), Inquiry, Notification, ChatMessage

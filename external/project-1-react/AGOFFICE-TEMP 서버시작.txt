@@ -1,0 +1,14 @@
+1. pkill -f next
+2. pnpm install
+3. nohup pnpm start > output.log 2>&1 &
+
+** 
+lsof -i :3000 으로 포트조회가안될때
+
+pnpm start
+
+로 세션으로 실행후
+
+에러로그 확인할것(대부분 종속성 설치 문제)
+
+

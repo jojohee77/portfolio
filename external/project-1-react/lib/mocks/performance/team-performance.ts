@@ -1,0 +1,53 @@
+import type { TeamPerformance } from './types'
+
+export const teamPerformance: TeamPerformance[] = [
+  {
+    id: "team1",
+    name: "1팀",
+    color: "bg-blue-500",
+    colorLight: "bg-blue-50",
+    monthlyRevenue: 95000000,
+    totalContractRevenue: 1120000000,
+    companiesCount: 8,
+    avgCompanyRevenue: 140000000,
+    avgRevenuePerMember: 560000000,
+    memberCount: 4,
+  },
+  {
+    id: "team2",
+    name: "2팀",
+    color: "bg-green-500",
+    colorLight: "bg-green-50",
+    monthlyRevenue: 87000000,
+    totalContractRevenue: 1040000000,
+    companiesCount: 8,
+    avgCompanyRevenue: 130000000,
+    avgRevenuePerMember: 520000000,
+    memberCount: 4,
+  },
+  {
+    id: "team3",
+    name: "3팀",
+    color: "bg-amber-500",
+    colorLight: "bg-amber-50",
+    monthlyRevenue: 72000000,
+    totalContractRevenue: 860000000,
+    companiesCount: 8,
+    avgCompanyRevenue: 107500000,
+    avgRevenuePerMember: 430000000,
+    memberCount: 4,
+  },
+  {
+    id: "team4",
+    name: "4팀",
+    color: "bg-purple-500",
+    colorLight: "bg-purple-50",
+    monthlyRevenue: 31000000,
+    totalContractRevenue: 360000000,
+    companiesCount: 12,
+    avgCompanyRevenue: 30000000,
+    avgRevenuePerMember: 90000000,
+    memberCount: 4,
+  },
+]
+

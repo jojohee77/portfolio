@@ -1,0 +1,25 @@
+# 프로젝트 루트에서 빌드 후 서버에 업로드후 배포하는 방식
+
+nvm use 22
+pnpm install --frozen-lockfile
+pnpm run build
+
+tar -czf agoffice.tar.gz `
+  --exclude=node_modules `
+  --exclude=.git `
+  --exclude='.next\cache' `
+  .
+
+agoffice.tar.gz 서버에 업로드
+
+
+#서버 app폴더에서 
+
+rm -rf ./*
+tar xzf agoffice.tar.gz
+
+nvm use 22
+pnpm install --prod
+
+pm2 restart agoffice
+
