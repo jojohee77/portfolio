@@ -11,6 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+external/project-1-react/node_modules
+external/project-1-react/.next
+external/project-1-react/*.log
+external/project-1-react/.pnpm-store
+external/project-1-react/tsconfig.tsbuildinfo
 
 # Editor directories and files
 .vscode/*
