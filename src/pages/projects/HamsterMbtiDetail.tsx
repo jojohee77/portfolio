@@ -10,7 +10,7 @@ export default function HamsterMbtiDetail() {
       responsibility="기획 · UI/UX 디자인 · React 기반 화면 구현"
       contribution="100%"
       period="2024.05 - 2024.07"
-      siteUrl="https://hamzzi-mbti.onrender.com/"
+      siteUrl="https://hamzzi-mbti.vercel.app/"
       heroVideoSrc="/images/project-4/project4-main.mov"
       images={[]}
       bottomImageRows={[
