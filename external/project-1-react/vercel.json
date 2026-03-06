@@ -1,3 +1,3 @@
 {
-  "buildCommand": "pnpm exec prisma generate && pnpm run build"
+  "buildCommand": "DATABASE_URL='mysql://demo:demo@127.0.0.1:3306/demo' pnpm exec prisma generate && pnpm run build"
 }
